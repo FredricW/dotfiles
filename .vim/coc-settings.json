@@ -1,0 +1,21 @@
+{
+  "codeLens.enable": true,
+  "diagnostic.errorSign": "•",
+  "diagnostic.infoSign": "•",
+  "diagnostic.warningSign": "•",
+  "eslint.autoFixOnSave": true,
+  "css.lint.unknownAtRules": "ignore",
+  "eslint.filetypes": [
+    "javascript",
+    "javascript.jsx",
+    "typescript",
+    "typescript.tsx",
+    "typescript.jsx",
+    "typescriptreact",
+    "javascriptreact"
+  ],
+  "suggest.timeout": 5000,
+  "typescript.suggestionActions.enabled": false,
+  "coc.preferences.formatOnType": true,
+  "suggest.maxCompleteItemCount": 10
+}

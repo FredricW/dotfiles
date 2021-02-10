@@ -8,6 +8,8 @@ alias ls="ls -1a"
 alias vim="nvim"
 alias vi="nvim ."
 
+alias doom="~/.emacs.d/bin/doom"
+
 alias note="cd ~/Documents/Notes && vim ."
 alias mux="tmuxinator"
 alias commit="git-cz"
@@ -35,7 +37,7 @@ alias ns="npm start"
 
 # Network
 alias ip="echo \"local: \$(ifconfig | grep \"inet \" | grep -Fv 127.0.0.1 | awk '{print \$2}')\" && echo \"public: \" && curl ifconfig.me || echo"
-
+ZSH_DISABLE_COMPFIX=true
 # Path to your oh-my-zsh installation.
 export ZSH="/Users/fredricwaadeland/.oh-my-zsh"
 # source ~/.bin/tmuxinator.zsh
@@ -135,7 +137,7 @@ source $ZSH/oh-my-zsh.sh
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export PATH="$PATH:./node_modules/.bin"
 
-bindkey -v
+# bindkey -v # vimmode
 bindkey '^P' up-history
 bindkey '^N' down-history
 bindkey '^?' backward-delete-char
@@ -152,5 +154,19 @@ function zle-line-init zle-keymap-select {
 zle -N zle-line-init
 zle -N zle-keymap-select
 export KEYTIMEOUT=1
+
+export BAT_THEME=dracula
+# Feed the output of ag into fzf
+ag -g "" | fzf
+
+# Setting ag as the default source for fzf
+export FZF_DEFAULT_COMMAND='ag -g ""'
+
+# Now fzf (w/o pipe) will use ag instead of find
+# fzf
+
+# To apply the command to CTRL-T as well
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_DEFAULT_COMMAND='ag -g ""'
 
 
