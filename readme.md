@@ -1,3 +1,8 @@
 # My Dotfiles collection
 
-Install with stow: `~/dotfiles/ -> stow *`
+Install
+
+```sh
+> cd ~/dotfiles/
+> stow macos
+```
