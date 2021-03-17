@@ -22,12 +22,21 @@ alias dotfiles='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'
 alias discard="hub checkout -- ."
 alias clean="hub clean -df"
 alias diff="hub diff --name-only develop..."
-alias check="hub checkout"
 alias pull="hub pull"
 alias push="hub push"
-alias branch="hub branch"
+alias branch="hub checkout -b"
+alias trunk="hub checkout trunk"
 alias pr="hub pr list"
 alias checkpr="hub pr checkout"
+
+# fbr - checkout git branch (including remote branches)
+chk() {
+ local branches branch
+  branches=$(git for-each-ref --count=30 --sort=-committerdate refs/heads/ --format="%(refname:short)") &&
+  branch=$(echo "$branches" |
+           fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+  git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+}
 
 alias dev="tmuxinator start -p ~/.config/tmuxinator/hafslund.yml"
 
@@ -37,7 +46,7 @@ alias ns="npm start"
 
 # Network
 alias ip="echo \"local: \$(ifconfig | grep \"inet \" | grep -Fv 127.0.0.1 | awk '{print \$2}')\" && echo \"public: \" && curl ifconfig.me || echo"
-ZSH_DISABLE_COMPFIX=true
+# ZSH_DISABLE_COMPFIX=true
 # Path to your oh-my-zsh installation.
 export ZSH="/Users/fredricwaadeland/.oh-my-zsh"
 # source ~/.bin/tmuxinator.zsh
@@ -134,7 +143,7 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export PATH="$PATH:./node_modules/.bin"
 
 # bindkey -v # vimmode
@@ -144,6 +153,17 @@ bindkey '^?' backward-delete-char
 bindkey '^h' backward-delete-char
 bindkey '^w' backward-kill-word
 bindkey '^r' history-incremental-search-backward
+
+# History search
+bindkey "^[[A" history-beginning-search-backward
+bindkey "^[[B" history-beginning-search-forward
+
+# History search with cursor at the end
+# autoload -U history-search-end
+# zle -N history-beginning-search-backward-end history-search-end
+# zle -N history-beginning-search-forward-end history-search-end
+# bindkey "^[[A" history-beginning-search-backward-end
+# bindkey "^[[B" history-beginning-search-forward-end
 
 function zle-line-init zle-keymap-select {
     VIM_PROMPT="%{$fg_bold[yellow]%} [% NORMAL]%  %{$reset_color%}"
@@ -157,16 +177,16 @@ export KEYTIMEOUT=1
 
 export BAT_THEME=dracula
 # Feed the output of ag into fzf
-ag -g "" | fzf
+# ag -g "" | fzf
 
 # Setting ag as the default source for fzf
-export FZF_DEFAULT_COMMAND='ag -g ""'
+# export FZF_DEFAULT_COMMAND='ag -g ""'
 
 # Now fzf (w/o pipe) will use ag instead of find
 # fzf
 
 # To apply the command to CTRL-T as well
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_DEFAULT_COMMAND='ag -g ""'
+# export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+# export FZF_DEFAULT_COMMAND='ag -g ""'
 
 
