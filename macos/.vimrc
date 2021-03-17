@@ -15,6 +15,7 @@ Plug 'vim-airline/vim-airline' " bottom toolbar
 Plug 'vim-airline/vim-airline-themes'
 Plug 'airblade/vim-gitgutter' " Git line status next to line number
 Plug 'kshenoy/vim-signature' " Visualizing marks
+Plug 'luochen1990/rainbow'
 " Plug 'rafi/awesome-vim-colorschemes'
 " Plug 'jparise/vim-graphql' " graphql syntax support
 
@@ -60,7 +61,11 @@ filetype plugin on
 set nocompatible
 " open splits on the right
 set splitright
-
+let g:rainbow_active = 1
+let g:rainbow_conf = {
+  \ 'guifgs': ['#c058c0','#B1B695', '#ffffff']
+  \ }
+" ({[({[({[]})]})]})
 " monokai-pro adaptaion theme 'sonokai'
 if has('termguicolors')
   set termguicolors
