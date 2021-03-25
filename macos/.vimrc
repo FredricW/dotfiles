@@ -140,8 +140,8 @@ nmap <silent> <leader>dy <Plug>(coc-type-definition)
 nmap <silent> <leader>dn <Plug>(coc-rename)
 nmap <silent> <leader>dl <Plug>(coc-codelens-action)
 nmap <silent> <leader>da <Plug>(coc-codeaction)
-nmap <silent> <leader>e <Plug>(coc-diagnostic-next-error)
-nmap <silent> <leader>E <Plug>(coc-diagnostic-prev-error)
+nmap <silent> <leader>e <Plug>(coc-diagnostic-next)
+nmap <silent> <leader>E <Plug>(coc-diagnostic-prev)
 nmap <silent> <leader>p :Prettier<cr>
 inoremap <silent><expr> <Tab> coc#refresh()
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
