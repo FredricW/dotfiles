@@ -25,6 +25,8 @@ Plug 'tpope/vim-surround'
 Plug 'mattn/emmet-vim' " Emmet completion / snippets
 Plug 'scrooloose/nerdcommenter' " Auto comment
 Plug 'raimondi/delimitmate' " Autoclose brackets and quotes
+Plug 'preservim/tagbar' " ctags viewer
+Plug 'bitterjug/vim-tagbar-ctags-elm' " elm support in tagbar
 " Plug 'terryma/vim-multiple-cursors'
 "" Plug 'dhruvasagar/vim-table-mode' " Create tables in vim
 
@@ -97,6 +99,12 @@ command! BD call fzf#run(fzf#wrap({
 \ }))
 nnoremap <leader>bd :BD<CR>
 
+
+""" Tagbar
+nnoremap <leader>ta :Tags<CR>
+nnoremap <leader>tt :BTags<CR>
+nnoremap <leader>tb :TagbarOpen<CR>
+let g:tagbar_autoclose = 1
 
 
 """ PRETTIER
