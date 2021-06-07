@@ -473,6 +473,7 @@ command! -bang -nargs=* F call fzf#vim#grep(g:rg_command .shellescape(<q-args>),
 
 nnoremap <leader>F :Rg<CR>
 
+" rg is configured in more detail in ~/.ripgreprc
 let $FZF_DEFAULT_COMMAND="rg --files"
 let $FZF_DEFAULT_OPTS=' --layout=reverse --color=border:#ffffff --margin=1,4'
 let g:fzf_layout = { 'window': 'call FloatingFZF()' }

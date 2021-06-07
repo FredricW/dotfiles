@@ -1,5 +1,6 @@
 
 export EDITOR="nvim"
+export RIPGREP_CONFIG_PATH="/Users/fredricwaadeland/.ripgreprc"
 alias vim="nvim"
 alias commit="git-cz"
 alias reload="source ~/.bash_profile"

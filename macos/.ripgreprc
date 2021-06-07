@@ -1,0 +1,5 @@
+# show hidden files (dotfiles)
+--hidden
+
+# ignore git
+--glob=!.git/*
