@@ -2,8 +2,8 @@
 call plug#begin('~/.vim/plugged')
 
 " ======== SESSION ========
-Plug 'xolox/vim-misc' " Dependency for vim-session
-Plug 'xolox/vim-session' " Session management
+" Plug 'xolox/vim-misc' " Dependency for vim-session
+" Plug 'xolox/vim-session' " Session management
 " Plug 'gcmt/taboo.vim' " Tab management
 " Plug 'mhinz/vim-startify' " Start screen
 
@@ -22,13 +22,13 @@ Plug 'luochen1990/rainbow'
 " ========= EDITOR =========
 Plug 'neoclide/coc.nvim', {'branch': 'release'} " Autocomplete
 Plug 'tpope/vim-surround'
-Plug 'mattn/emmet-vim' " Emmet completion / snippets
+" Plug 'mattn/emmet-vim' " Emmet completion / snippets
 Plug 'scrooloose/nerdcommenter' " Auto comment
-Plug 'raimondi/delimitmate' " Autoclose brackets and quotes
-Plug 'preservim/tagbar' " ctags viewer
-Plug 'bitterjug/vim-tagbar-ctags-elm' " elm support in tagbar
+" Plug 'raimondi/delimitmate' " Autoclose brackets and quotes
+" Plug 'preservim/tagbar' " ctags viewer
+" Plug 'bitterjug/vim-tagbar-ctags-elm' " elm support in tagbar
 " Plug 'terryma/vim-multiple-cursors'
-"" Plug 'dhruvasagar/vim-table-mode' " Create tables in vim
+" Plug 'dhruvasagar/vim-table-mode' " Create tables in vim
 
 " ========= UTILITY ========
 Plug 'tpope/vim-fugitive' " Git support
