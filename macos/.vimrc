@@ -33,6 +33,7 @@ Plug 'scrooloose/nerdcommenter' " Auto comment
 " ========= UTILITY ========
 Plug 'tpope/vim-fugitive' " Git support
 Plug 'scrooloose/nerdtree' " File browser
+Plug 'christoomey/vim-tmux-navigator' " tmux navigation
 " Plug 'Xuyuanp/nerdtree-git-plugin' " Show git status in file browser
 " Plug 'vimwiki/vimwiki' " Notetaking
 

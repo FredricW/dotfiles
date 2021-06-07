@@ -7,3 +7,5 @@ export BAT_THEME="Dracula"
 
 alias config='/usr/bin/git --git-dir=/Users/fredricwaadeland/.cfg/ --work-tree=/Users/fredricwaadeland'
 alias config='/usr/bin/git --git-dir=/Users/fredricwaadeland/.cfg/ --work-tree=/Users/fredricwaadeland'
+
+source ~/.bash_profile
