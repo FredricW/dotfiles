@@ -51,4 +51,8 @@ windows:
       panes:
         - vtop
         - cd client && yarn start
-  - config: dotfiles
+  - config:
+      layout: main-vertical
+      panes:
+        - dotfiles && vi
+        - dotfiles
