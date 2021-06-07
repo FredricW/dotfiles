@@ -452,7 +452,7 @@ nnoremap <leader>h :History<CR>
 " fzf checkout
 nnoremap <leader>gc :GCheckout<CR>
 
-"" fzf.vim
+" fzf.vim
 set grepprg=rg\ --vimgrep\ $*  " Use ripgrep
 set wildmode=list:longest,list:full
 set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__
@@ -527,9 +527,9 @@ endfunction
 " let g:vimwiki_list = [{'path': '~/Notes/vimwiki'}]
 
 """ FOLDING
-" set foldmethod=expr
-" set foldexpr=getline(v:lnum)=~'^\"\"'?'>'.(matchend(getline(v\:lnum),'\"\"*')-2)\:'='
-"" set foldexpr=strlen(substitute(substitute(getline(v:lnum),'\\s','',\"g\"),'[^>].*','',''))
+set foldmethod=expr
+set foldexpr=getline(v:lnum)=~'^\"\"'?'>'.(matchend(getline(v\:lnum),'\"\"*')-2)\:'='
+" set foldexpr=strlen(substitute(substitute(getline(v:lnum),'\\s','',\"g\"),'[^>].*','',''))
 
 " set fillchars+=vert:\ 
 " hi foldcolumn ctermbg=NONE ctermfg=LightBlue
