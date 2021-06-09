@@ -476,7 +476,7 @@ nnoremap <leader>F :Rg<CR>
 
 " rg is configured in more detail in ~/.ripgreprc
 let $FZF_DEFAULT_COMMAND="rg --files"
-let $FZF_DEFAULT_OPTS=' --layout=reverse --color=border:#ffffff --margin=1,4'
+let $FZF_DEFAULT_OPTS=' --layout=reverse --color=border:#241F26 --margin=1,4'
 let g:fzf_layout = { 'window': 'call FloatingFZF()' }
 
 let g:fzf_colors =
