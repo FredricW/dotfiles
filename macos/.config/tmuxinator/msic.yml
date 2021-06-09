@@ -52,7 +52,7 @@ windows:
         - vtop
         - cd client && yarn start
   - config:
-      layout: main-vertical
+      layout: a7e7,422x47,0,0{324x47,0,0,2,97x47,325,0,4}
       panes:
-        - dotfiles && vi
-        - dotfiles
+        - dotfiles && vi -O macos/.vimrc macos/.config/tmuxinator/msic.yml
+        - dotfiles && gss
