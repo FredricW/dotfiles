@@ -175,7 +175,7 @@ zle -N zle-line-init
 zle -N zle-keymap-select
 export KEYTIMEOUT=1
 
-export BAT_THEME=dracula
+export BAT_THEME="Dracula"
 export RIPGREP_CONFIG_PATH=/Users/fredricwaadeland/.ripgreprc
 # Feed the output of ag into fzf
 # ag -g "" | fzf
