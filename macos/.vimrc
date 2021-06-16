@@ -11,8 +11,7 @@ call plug#begin('~/.vim/plugged')
 Plug 'sainnhe/sonokai'
 Plug 'dracula/vim', { 'as': 'dracula' } " colorscheme
 Plug 'sheerun/vim-polyglot' " Syntax highlighting 
-Plug 'vim-airline/vim-airline' " bottom toolbar
-Plug 'vim-airline/vim-airline-themes'
+Plug 'itchyny/lightline.vim' " Status bar
 Plug 'airblade/vim-gitgutter' " Git line status next to line number
 Plug 'kshenoy/vim-signature' " Visualizing marks
 Plug 'luochen1990/rainbow'
@@ -184,28 +183,33 @@ autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | silent! pclose | endif
 hi Background cterm=NONE guifg=NONE guibg=NONE
 
 
-""" AIRLINE
-" Theme
-let g:airline_theme='deus'
-"let g:airline_solarized_bg='dark'
+""" Lightline (statusbar)
 
-let g:airline_powerline_fonts = 1
-if !exists('g:airline_symbols')
-    let g:airline_symbols = {}
-endif
+let g:lightline = {
+  \ 'colorscheme': 'one',
+  \ 'active': {
+  \   'left': [ [ 'mode', 'paste' ],
+  \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+  \ },
+  \ 'component_function': {
+  \   'gitbranch': 'FugitiveHead'
+  \ },
+  \ }
 
-" Icons
-" let g:airline_left_sep="\u25B6"
-" let g:airline_right_sep="\u25C0"
-" let g:airline_left_sep='⮀'
-" let g:airline_right_sep=''
-let g:airline_left_sep=''
-let g:airline_right_sep=''
+command! LightlineReload call LightlineReload()
 
-" Section config
-" let g:airline_section_c=''
-let g:airline_section_y=''
-let g:airline_section_z='%L'
+function! LightlineReload()
+  call lightline#init()
+  call lightline#colorscheme()
+  call lightline#update()
+endfunction
+
+autocmd VimEnter * call SetupLightlineColors()
+function SetupLightlineColors() abort
+  let l:pallete = lightline#palette()
+  let l:pallete.normal.left[1][3] = 'NONE'
+  call lightline#colorscheme()
+endfunction
 
 
 """ EDITOR
@@ -475,7 +479,7 @@ command! -bang -nargs=* F call fzf#vim#grep(g:rg_command .shellescape(<q-args>),
 nnoremap <leader>F :Rg<CR>
 
 " rg is configured in more detail in ~/.ripgreprc
-let $FZF_DEFAULT_COMMAND="rg --files"
+let $FZF_DEFAULT_COMMAND='rg --files --column --follow --no-heading --line-number'
 let $FZF_DEFAULT_OPTS=' --layout=reverse --color=border:#241F26 --margin=1,4'
 let g:fzf_layout = { 'window': 'call FloatingFZF()' }
 
