@@ -216,7 +216,7 @@ hi Cursor ctermbg=125
 " " Visual mode selection
 hi Visual ctermbg=050 guibg=#241F26
 " " Background color
-hi Normal ctermbg=None
+hi Normal ctermbg=None guibg=None
 
 " " Toggle comment
 let g:NERDSpaceDelims = 1
@@ -232,7 +232,7 @@ set scrolloff=5
 set number
 set relativenumber
 set numberwidth=3
-hi VertSplit ctermfg=234 ctermbg=NONE guifg=bg guibg=#191B24
+" hi VertSplit ctermfg=234 ctermbg=NONE guifg=NONE guibg=#191B24
 set encoding=utf8
 
 " Remove border character (not working atm)
@@ -300,8 +300,8 @@ hi GitGutterDelete ctermfg=125 cterm=bold
 hi GitGutterChangeDelete ctermfg=220 cterm=bold
 
 """ TABS
-set showtabline=2
-hi TabLineFill cterm=NONE guifg=#212430
+" set showtabline=2
+" hi TabLineFill cterm=NONE guifg=DEFAULT
 " hi TabLine ctermfg=062 ctermbg=234 cterm=NONE guifg=#5f5fd7 guibg=#1c1c1c
 hi TabLine ctermfg=062 ctermbg=234 cterm=NONE guifg=#847E89 guibg=#847E89
 hi TabLineSel ctermfg=White ctermbg=125 guifg=#c2d3cd guibg=#191B24
