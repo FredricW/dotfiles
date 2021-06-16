@@ -289,7 +289,7 @@ nnoremap <CR> :noh<CR>
 """ GIT
 :nnoremap <leader>a :diffput<CR>
 :nmap <Leader>hv <Plug>GitGutterPreviewHunk
-:map <Leader>g :Gstatus<CR>
+:map <Leader>g :Git<CR>
 
 " " Gdiff
 hi DiffAdd ctermfg=NONE ctermbg=234 cterm=NONE guibg=#192116
