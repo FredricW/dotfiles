@@ -39,6 +39,9 @@ chk() {
 }
 
 alias dev="tmuxinator start -p ~/.config/tmuxinator/hafslund.yml"
+renametab() {
+    echo -ne "\033]0;"$@"\007"
+}
 
 # NPM
 alias nr="npm run"
