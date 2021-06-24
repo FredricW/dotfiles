@@ -245,8 +245,10 @@ set numberwidth=3
 set encoding=utf8
 
 " Remove border character (not working atm)
-" set fillchars+=vert:\|
-" hi VertSplit ctermfg=234 cterm=NONE
+" set fillchars=""
+"guifg=#241F26
+hi VertSplit ctermfg=045 ctermbg=NONE cterm=NONE guifg=#241F26 guibg=NONE gui=NONE
+set fillchars+=vert:\│" with trailing space!
 
 highlight LineNr term=bold cterm=NONE ctermfg=060 ctermbg=NONE guifg=#594970 guibg=NONE
 highlight CursorLineNR ctermbg=NONE ctermfg=045 guifg=Turquoise2
