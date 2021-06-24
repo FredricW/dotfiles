@@ -5,7 +5,7 @@ call plug#begin('~/.vim/plugged')
 " Plug 'xolox/vim-misc' " Dependency for vim-session
 " Plug 'xolox/vim-session' " Session management
 " Plug 'gcmt/taboo.vim' " Tab management
-" Plug 'mhinz/vim-startify' " Start screen
+Plug 'mhinz/vim-startify' " Start screen
 
 " ========= VISUAL =========
 Plug 'sainnhe/sonokai'
@@ -32,8 +32,9 @@ Plug 'scrooloose/nerdcommenter' " Auto comment
 " ========= UTILITY ========
 Plug 'tpope/vim-fugitive' " Git support
 Plug 'scrooloose/nerdtree' " File browser
+Plug 'PhilRunninger/nerdtree-visual-selection' " operate on multiple files
 Plug 'christoomey/vim-tmux-navigator' " tmux navigation
-" Plug 'Xuyuanp/nerdtree-git-plugin' " Show git status in file browser
+Plug 'Xuyuanp/nerdtree-git-plugin' " Show git status in file browser
 " Plug 'vimwiki/vimwiki' " Notetaking
 
 if isdirectory('/usr/local/opt/fzf')
