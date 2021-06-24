@@ -29,7 +29,7 @@ font:
     # family: Iosevka
     # family: "Fira Code"
     # family: "Source Code Pro"
-    family: Menlo
+    family: "Source Code Pro for Powerline"
     # style: Retina
 
   # The bold font face
@@ -37,14 +37,16 @@ font:
     # family: Iosevka
     # family: "Fira Code"
     # family: "Source Code Pro"
-    family: Menlo
+    family: "Source Code Pro for Powerline"
+    # family: Menlo
 
   # The italic font face
   italic:
     # family: Iosevka
     # family: "Fira Code"
     # family: "Source Code Pro"
-    family: Menlo
+    # family: Menlo
+    family: "Source Code Pro for Powerline"
     # style: "Medium Italic"
 
   # Point size of the font
@@ -54,14 +56,14 @@ font:
   # as modifying the linespacing, and offset.x as modifying the letter spacing.
   offset:
     x: 0
-    y: 12
+    y: 8
 
   # Glyph offset determines the locations of the glyphs within their cells with
   # the default being at the bottom. Increase the x offset to move the glyph to
   # the right, increase the y offset to move the glyph upward.
   glyph_offset:
     x: 0
-    y: 6
+    y: 5
 
   # Thin stroke font rendering (macOS only)
   #
