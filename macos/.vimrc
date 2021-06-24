@@ -99,11 +99,15 @@ command! BD call fzf#run(fzf#wrap({
 \ }))
 nnoremap <leader>bd :BD<CR>
 
+""" TERMINAL
+" map esc to escape the builtin terminal
+" tnoremap  <C-\><C-n>
+nnoremap <leader>tt :term<CR>
 
 """ Tagbar
 nnoremap <leader>ta :Tags<CR>
-nnoremap <leader>tt :BTags<CR>
-nnoremap <leader>tb :TagbarOpen<CR>
+nnoremap <leader>tb :BTags<CR>
+nnoremap <leader>to :TagbarOpen<CR>
 let g:tagbar_autoclose = 1
 
 
