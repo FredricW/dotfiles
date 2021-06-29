@@ -156,7 +156,11 @@ nmap <silent> <leader>da <Plug>(coc-codeaction)
 nmap <silent> <leader>e <Plug>(coc-diagnostic-next)
 nmap <silent> <leader>E <Plug>(coc-diagnostic-prev)
 nmap <silent> <leader>p :Prettier<cr>
-inoremap <silent><expr> <Tab> coc#refresh()
+
+" Open Coc. Alacritty sends Nul when ctrl-space.
+" inoremap <silent><expr> <C-Nul> coc#refresh()
+inoremap <silent><expr> <C-space> coc#refresh()
+
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
