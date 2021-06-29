@@ -326,10 +326,10 @@ nnoremap <leader>tc :tabclose<CR>
 
 """ KEYBINDINGS
 " Global Copy Paste
-" nnoremap Y "+y
-" nnoremap P "+p
-" vnoremap Y "+y
-" vnoremap P "+p
+nnoremap <leader>y "+y
+nnoremap <leader>p "+p
+vnoremap <leader>y "+y
+vnoremap <leader>p "+p
 
 " Search for word
 " nnoremap <leader>n yiw/<C-r>"<CR>
