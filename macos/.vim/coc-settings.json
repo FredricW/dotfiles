@@ -17,5 +17,5 @@
   "suggest.timeout": 5000,
   "typescript.suggestionActions.enabled": false,
   "coc.preferences.formatOnType": true,
-  "suggest.maxCompleteItemCount": 10
+  "suggest.maxCompleteItemCount": 10,
 }

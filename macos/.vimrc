@@ -21,7 +21,7 @@ Plug 'luochen1990/rainbow'
 " ========= EDITOR =========
 Plug 'neoclide/coc.nvim', {'branch': 'release'} " Autocomplete
 Plug 'tpope/vim-surround'
-" Plug 'mattn/emmet-vim' " Emmet completion / snippets
+Plug 'mattn/emmet-vim' " Emmet completion / snippets
 Plug 'scrooloose/nerdcommenter' " Auto comment
 " Plug 'raimondi/delimitmate' " Autoclose brackets and quotes
 " Plug 'preservim/tagbar' " ctags viewer
