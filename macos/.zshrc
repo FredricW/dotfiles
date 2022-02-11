@@ -1,12 +1,22 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
+export VISUAL="nvim"
 export EDITOR="nvim"
 # source ~/.dotfile/tmuxinator.zsh
+export VAULT_ADDR="https://vault.test-elvia.io/"
+
+# # .NET Core SDK settings
+export DOTNET_CLI_TELEMETRY_OPTOUT=true
+# Development / Staging / Production
+export DOTNET_ENVIRONMENT='Development'
 
 alias ls="ls -1a"
 
 alias vim="nvim"
 alias vi="nvim ."
+
+bindkey "^[[1;3C" forward-word
+bindkey "^[[1;3D" backward-word
 
 alias doom="~/.emacs.d/bin/doom"
 
@@ -14,9 +24,9 @@ alias note="cd ~/Documents/Notes && vim ."
 alias mux="tmuxinator"
 alias commit="git-cz"
 alias reload="source ~/.zshrc"
-alias vrc="vim ~/dotfiles/macos/.vimrc"
-alias brc="vim ~/dotfiles/macos/.bashrc"
-alias zrc="vim ~/dotfiles/macos/.zshrc"
+alias vrc="nvim ~/dotfiles/macos/.vimrc"
+alias brc="nvim ~/dotfiles/macos/.bashrc"
+alias zrc="nvim ~/dotfiles/macos/.zshrc"
 alias bashprofile="vim ~/.bash_profile"
 alias dotfiles='cd ~/dotfiles' 
 alias discard="hub checkout -- ."
@@ -51,7 +61,7 @@ alias ns="npm start"
 alias ip="echo \"local: \$(ifconfig | grep \"inet \" | grep -Fv 127.0.0.1 | awk '{print \$2}')\" && echo \"public: \" && curl ifconfig.me || echo"
 # ZSH_DISABLE_COMPFIX=true
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/fredricwaadeland/.oh-my-zsh"
+export ZSH="/Users/hansfredricwaadeland/.oh-my-zsh"
 # source ~/.bin/tmuxinator.zsh
 
 # Set name of the theme to load. Optionally, if you set this to "random"
@@ -179,7 +189,7 @@ zle -N zle-keymap-select
 export KEYTIMEOUT=1
 
 export BAT_THEME="Dracula"
-export RIPGREP_CONFIG_PATH=/Users/fredricwaadeland/.ripgreprc
+export RIPGREP_CONFIG_PATH=/Users/hansfredricwaadeland/.ripgreprc
 # Feed the output of ag into fzf
 # ag -g "" | fzf
 
