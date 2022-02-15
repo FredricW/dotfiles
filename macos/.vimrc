@@ -22,7 +22,7 @@ Plug 'ObserverOfTime/coloresque.vim' " color preview
 " ========= EDITOR =========
 " Plug 'neoclide/coc.nvim', {'branch': 'release'} " Autocomplete
 Plug 'neovim/nvim-lspconfig'
-Plug 'kabouzeid/nvim-lspinstall'
+Plug 'williamboman/nvim-lsp-installer'
 Plug 'hrsh7th/nvim-compe' " autocomplete for lsp
 Plug 'hrsh7th/vim-vsnip'
 Plug 'hrsh7th/vim-vsnip-integ' " VSCode/LSP snippet feature
