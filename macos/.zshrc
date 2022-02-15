@@ -5,6 +5,8 @@ export EDITOR="nvim"
 # source ~/.dotfile/tmuxinator.zsh
 export VAULT_ADDR="https://vault.test-elvia.io/"
 
+export PATH=/opt/homebrew/bin:$PATH
+
 # # .NET Core SDK settings
 export DOTNET_CLI_TELEMETRY_OPTOUT=true
 # Development / Staging / Production
@@ -61,7 +63,7 @@ alias ns="npm start"
 alias ip="echo \"local: \$(ifconfig | grep \"inet \" | grep -Fv 127.0.0.1 | awk '{print \$2}')\" && echo \"public: \" && curl ifconfig.me || echo"
 # ZSH_DISABLE_COMPFIX=true
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/hansfredricwaadeland/.oh-my-zsh"
+export ZSH="/Users/fredricwaadeland/.oh-my-zsh"
 # source ~/.bin/tmuxinator.zsh
 
 # Set name of the theme to load. Optionally, if you set this to "random"
