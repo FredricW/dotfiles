@@ -9,6 +9,8 @@ window:
 
   startup_mode: Windowed
 
+  opacity: 1
+
 # fix curly brackets on MacOs
 alt_send_esc: false
 
@@ -29,24 +31,25 @@ font:
     # family: Iosevka
     # family: "Fira Code"
     # family: "Source Code Pro"
-    family: "Source Code Pro for Powerline"
+    # family: "Source Code Pro for Powerline"
     # style: Retina
+    family: Menlo
 
   # The bold font face
   bold:
     # family: Iosevka
     # family: "Fira Code"
     # family: "Source Code Pro"
-    family: "Source Code Pro for Powerline"
-    # family: Menlo
+    # family: "Source Code Pro for Powerline"
+    family: Menlo
 
   # The italic font face
   italic:
     # family: Iosevka
     # family: "Fira Code"
     # family: "Source Code Pro"
-    # family: Menlo
-    family: "Source Code Pro for Powerline"
+    family: Menlo
+    # family: "Source Code Pro for Powerline"
     # style: "Medium Italic"
 
   # Point size of the font
@@ -284,7 +287,6 @@ colors:
 # animation: EaseOutExpo
 # color: "0xffffff"
 # duration: 0
-background_opacity: 1.0
 
 # Key bindings
 #
