@@ -245,7 +245,7 @@ live_config_reload: true
 # vim: nospell
 
 scrolling:
-  history: 0
+  history: 10000
   multiplier: 3
 
 
