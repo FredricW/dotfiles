@@ -18,4 +18,4 @@ export NVM_DIR="$HOME/.nvm"
 # .NET Core SDK settings
 export DOTNET_CLI_ELEMETRY_OPTOUT=true
 # Development / Staging / Production
-export DOTNET_ENVIRONMENT='Development'T
+export DOTNET_ENVIRONMENT='Development'
