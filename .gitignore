@@ -2,3 +2,4 @@
 # Vim files
 undo_files/
 swap_files/
+.vim/plugged/
