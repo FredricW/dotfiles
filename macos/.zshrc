@@ -15,8 +15,7 @@ export DOTNET_ENVIRONMENT='Development'
 
 alias ls="ls -1a"
 
-alias vim="nvim"
-alias vi="nvim ."
+alias vi="nvim"
 
 bindkey "^[[1;3C" forward-word
 bindkey "^[[1;3D" backward-word
@@ -213,3 +212,7 @@ export RIPGREP_CONFIG_PATH=/Users/hansfredricwaadeland/.ripgreprc
 # export FZF_DEFAULT_COMMAND='ag -g ""'
 
 
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

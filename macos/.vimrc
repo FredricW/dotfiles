@@ -2,38 +2,45 @@
 call plug#begin('~/.vim/plugged')
 
 " ======== SESSION ========
-" Plug 'xolox/vim-misc' " Dependency for vim-session
-" Plug 'xolox/vim-session' " Session management
-" Plug 'gcmt/taboo.vim' " Tab management
 Plug 'mhinz/vim-startify' " Start screen
+Plug 'rmagatti/auto-session'
+Plug 'rmagatti/session-lens'
 
 " ========= VISUAL =========
 Plug 'sainnhe/sonokai'
 Plug 'dracula/vim', { 'as': 'dracula' } " colorscheme
-Plug 'sheerun/vim-polyglot' " Syntax highlighting 
 Plug 'itchyny/lightline.vim' " Status bar
-Plug 'airblade/vim-gitgutter' " Git line status next to line number
+" Plug 'feline-nvim/feline.nvim' " Status bar
+Plug 'lewis6991/gitsigns.nvim'
 Plug 'kshenoy/vim-signature' " Visualizing marks
 Plug 'luochen1990/rainbow'
 Plug 'ObserverOfTime/coloresque.vim' " color preview
-" Plug 'rafi/awesome-vim-colorschemes'
-" Plug 'jparise/vim-graphql' " graphql syntax support
 
 " ========= EDITOR =========
-" Plug 'neoclide/coc.nvim', {'branch': 'release'} " Autocomplete
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'neovim/nvim-lspconfig'
 Plug 'williamboman/nvim-lsp-installer'
-Plug 'hrsh7th/nvim-compe' " autocomplete for lsp
+Plug 'neovim/nvim-lspconfig'
+
+" Autocomplete plugins
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-cmdline'
+Plug 'hrsh7th/nvim-cmp'
+" For vsnip users.
+Plug 'hrsh7th/cmp-vsnip'
 Plug 'hrsh7th/vim-vsnip'
-Plug 'hrsh7th/vim-vsnip-integ' " VSCode/LSP snippet feature
+
 Plug 'tpope/vim-surround'
 Plug 'mattn/emmet-vim' " Emmet completion / snippets
-Plug 'scrooloose/nerdcommenter' " Auto comment
-" Plug 'raimondi/delimitmate' " Autoclose brackets and quotes
+Plug 'numToStr/Comment.nvim' " Comment toggle
+Plug 'windwp/nvim-autopairs'
 " Plug 'preservim/tagbar' " ctags viewer
 " Plug 'bitterjug/vim-tagbar-ctags-elm' " elm support in tagbar
-" Plug 'terryma/vim-multiple-cursors'
 " Plug 'dhruvasagar/vim-table-mode' " Create tables in vim
+Plug 'kyazdani42/nvim-web-devicons'
+Plug 'folke/trouble.nvim'
 
 " ========= UTILITY ========
 Plug 'tpope/vim-fugitive' " Git support
@@ -46,23 +53,24 @@ Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 
-" if isdirectory('/usr/local/opt/fzf')
- " Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
-" else
-" Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
-" Plug 'junegunn/fzf.vim'
-" endif
-" Plug 'stsewd/fzf-checkout.vim'
-
 Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
   \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
 
 call plug#end()
 
+" Init Lua Plugins
+lua << EOF
+require('nvim-autopairs').setup{}
+require('auto-session').setup{}
+require('telescope').load_extension('session-lens')
+require('Comment').setup{}
+EOF
+
 """ Session
 set sessionoptions+=tabpages,globals
-nnoremap <F2> :OpenSession<CR>
+" nnoremap <F2> :OpenSession<CR>
+nnoremap <leader>fs :Telescope session-lens search_session<CR>
 
 """ GLOBAL
 let mapleader = " "
@@ -114,6 +122,32 @@ endfunction
 " \ }))
 nnoremap <leader>bd :BD<CR>
 
+lua << EOF
+require'nvim-web-devicons'.setup {
+ -- your personnal icons can go here (to override)
+ -- you can specify color or cterm_color instead of specifying both of them
+ -- DevIcon will be appended to `name`
+
+ override = {
+  zsh = {
+    icon = "?",
+    color = "#428850",
+    cterm_color = "65",
+    name = "Zsh"
+  }
+ };
+ -- globally enable default icons (default to false)
+ -- will get overriden by `get_icons` option
+ default = true;
+}
+
+-- require('feline').setup()
+-- require('feline').add_theme('6cdh', 6cdh)
+-- require('feline').use_theme('6cdh')
+
+EOF
+
+
 """ TERMINAL
 " map esc to escape the builtin terminal
 " tnoremap  <C-\><C-n>
@@ -134,14 +168,18 @@ let g:prettier#autoformat_require_pragma = 0
 " adding a comment
 
 """ LSP
+nnoremap <silent> ca <cmd>lua vim.lsp.buf.code_action()<CR>
 
 lua << EOF
 local lsp_installer = require("nvim-lsp-installer")
 
 -- Register a handler that will be called for each installed server when it's ready (i.e. when installation is finished
 -- or if the server is already installed).
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 lsp_installer.on_server_ready(function(server)
-    local opts = {}
+    local opts = {
+      capabilities = capabilities
+    }
 
     -- (optional) Customize the options passed to the server
     -- if server.name == "tsserver" then
@@ -189,30 +227,21 @@ local on_attach = function(client, bufnr)
 
 end
 
--- Use a loop to conveniently call 'setup' on multiple servers and
--- map buffer local keybindings when the language server attaches
--- local servers = { 'pyright', 'rust_analyzer', 'tsserver' }
--- for _, lsp in ipairs(servers) do
---   nvim_lsp[lsp].setup {
---     on_attach = on_attach,
---    flags = {
---      debounce_text_changes = 150,
---    }
---  }
--- end
-EOF
+require("trouble").setup { }
 
-"Remap keys for gotos (coc old bindings)
-" nmap <silent> <leader>dr <Plug>(coc-references)
-" nmap <silent> <leader>dR <Plug>(coc-refactor)
-" nmap <silent> <leader>dd <Plug>(coc-implementation)
-" nmap <silent> <leader>dy <Plug>(coc-type-definition)
-" nmap <silent> <leader>dn <Plug>(coc-rename)
-" nmap <silent> <leader>dl <Plug>(coc-codelens-action)
-" nmap <silent> <leader>da <Plug>(coc-codeaction)
-" nmap <silent> <leader>e <Plug>(coc-diagnostic-next)
-" nmap <silent> <leader>E <Plug>(coc-diagnostic-prev)
-" nmap <silent> <leader>p :Prettier<cr>
+local signs = {
+    Error = " ",
+    Warn = " ",
+    Hint = " ",
+    Info = " "
+}
+
+for type, icon in pairs(signs) do
+    local hl = "DiagnosticSign" .. type
+    vim.fn.sign_define(hl, {text = icon, texthl = hl, numhl = hl})
+end
+
+EOF
 
 " popup menu background
 hi Pmenu ctermbg=234 ctermfg=007 guibg=#191B24 guifg=#B1B695
@@ -222,40 +251,77 @@ autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | silent! pclose | endif
 hi Background cterm=NONE guifg=NONE guibg=NONE
 
 
-""" AUTOCOMPLETE (compe)
-set completeopt=menuone,noselect
+""" AUTOCOMPLETE (nvim-cmp)
+set completeopt=menu,menuone,noselect
 
-let g:compe = {}
-let g:compe.enabled = v:true
-let g:compe.autocomplete = v:true
-let g:compe.debug = v:false
-let g:compe.min_length = 1
-let g:compe.preselect = 'enable'
-let g:compe.throttle_time = 80
-let g:compe.source_timeout = 200
-let g:compe.resolve_timeout = 800
-let g:compe.incomplete_delay = 400
-let g:compe.max_abbr_width = 100
-let g:compe.max_kind_width = 100
-let g:compe.max_menu_width = 100
-let g:compe.documentation = v:true
+lua << EOF
+  -- Setup nvim-cmp.
+  local cmp = require'cmp'
 
-let g:compe.source = {}
-let g:compe.source.path = v:true
-let g:compe.source.buffer = v:true
-let g:compe.source.calc = v:true
-let g:compe.source.nvim_lsp = v:true
-let g:compe.source.nvim_lua = v:true
-let g:compe.source.vsnip = v:true
-let g:compe.source.ultisnips = v:true
-let g:compe.source.luasnip = v:true
-let g:compe.source.emoji = v:true
+  cmp.setup({
+    snippet = {
+      -- REQUIRED - you must specify a snippet engine
 
-inoremap <silent><expr> <C-Space> compe#complete()
-inoremap <silent><expr> <CR>      compe#confirm('<CR>')
-inoremap <silent><expr> <C-e>     compe#close('<C-e>')
-inoremap <silent><expr> <C-f>     compe#scroll({ 'delta': +4 })
-inoremap <silent><expr> <C-d>     compe#scroll({ 'delta': -4 })
+      expand = function(args)
+        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+        -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+        -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
+        -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+      end,
+    },
+    mapping = {
+      ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
+      ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
+      ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
+      ['<C-y>'] = cmp.config.disable, --Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
+      ['<C-e>'] = cmp.mapping({
+        i = cmp.mapping.abort(),
+        c = cmp.mapping.close(),
+      }),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    },
+
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'vsnip' },
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Set configuration for specific filetype.
+  cmp.setup.filetype('gitcommit', {
+    sources = cmp.config.sources({
+      { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline('/', {
+    sources = {
+      { name = 'buffer' }
+    }
+  })
+
+  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline(':', {
+    sources = cmp.config.sources({
+      { name = 'path' }
+    }, {
+      { name = 'cmdline' }
+    })
+  })
+
+  -- Setup lspconfig.
+  -- local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  -- -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+  -- require('lspconfig')['<YOUR_LSP_SERVER>'].setup {
+  --   capabilities = capabilities
+  -- }
+  --
+EOF
 
 """ Lightline (statusbar)
 
@@ -291,15 +357,21 @@ endfunction
 " " Cursor (iTerm overrides this though)
 hi Cursor ctermbg=125
 
+" line height
+set linespace=16
+
+" Command line
+hi MsgArea guifg=#594970
+
 " " Visual mode selection
 hi Visual ctermbg=050 guibg=#241F26
 " " Background color
-hi Normal ctermbg=None guibg=None
+hi Normal ctermbg=None guibg=#282935
 
 " " Toggle comment
-let g:NERDSpaceDelims = 1
-let g:NERDToggleCheckAllLines = 1
-map <leader><leader> <plug>NERDCommenterToggle
+" let g:NERDSpaceDelims = 1
+" let g:NERDToggleCheckAllLines = 1
+map <leader><leader> gcc
 
 
 " " Mouse scrolling
@@ -363,21 +435,13 @@ nnoremap <CR> :noh<CR>
 " nnoremap <leader>d :TSDef<CR>
 
 """ GIT
+
+lua << EOF
+require('gitsigns').setup()
+EOF
+
 :nnoremap <leader>a :diffput<CR>
-:nmap <Leader>hv <Plug>GitGutterPreviewHunk
 :map <Leader>g :Git<CR>
-
-" " Gdiff
-hi DiffAdd ctermfg=NONE ctermbg=234 cterm=NONE guibg=#192116
-hi DiffText ctermfg=220 ctermbg=234 cterm=NONE guibg=#130D00
-hi DiffChange ctermbg=060 guibg=NONE
-hi DiffDelete ctermfg=089 ctermbg=234 guibg=NONE guifg=#211717
-
-" " GitGutter symbols
-hi GitGutterAdd ctermfg=070
-hi GitGutterChange ctermfg=220
-hi GitGutterDelete ctermfg=125 cterm=bold
-hi GitGutterChangeDelete ctermfg=220 cterm=bold
 
 """ TABS
 " set showtabline=2
@@ -398,8 +462,10 @@ vnoremap <leader>p "+p
 
 " Search for word
 " nnoremap <leader>n yiw/<C-r>"<CR>
-" search, highlight and replace
-nnoremap <leader>* yiw/<C-r>"<CR>:%s/<C-r>"/
+" search, highlight and replace (case-sensitive)
+nnoremap <leader>* yiw/<C-r>"<CR>:%s/\C<C-r>"/
+set ignorecase
+set smartcase
 
 " NERDTree
 " nnoremap <S-Tab> :NERDTreeFind<CR>
@@ -542,6 +608,8 @@ highlight TelescopeBorder         guifg=#241F26
 highlight TelescopePromptBorder   guifg=#B1B695
 highlight TelescopeResultsBorder  guifg=#B1B695
 highlight TelescopePreviewBorder  guifg=#B1B695
+highlight TelescopeTitle          guifg=#B1B695
+
 
 lua << EOF
 local actions = require('telescope.actions')
