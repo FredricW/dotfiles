@@ -19,3 +19,4 @@ export NVM_DIR="$HOME/.nvm"
 export DOTNET_CLI_ELEMETRY_OPTOUT=true
 # Development / Staging / Production
 export DOTNET_ENVIRONMENT='Development'
+. "$HOME/.cargo/env"

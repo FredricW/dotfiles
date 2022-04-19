@@ -9,3 +9,4 @@ alias bashrc="vim ~/.bashrc"
 alias bashprofile="vim ~/.bash_profile"
 export PATH="/usr/local/bin:${PATH}"
 
+. "$HOME/.cargo/env"

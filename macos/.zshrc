@@ -6,6 +6,7 @@ export EDITOR="nvim"
 export VAULT_ADDR="https://vault.test-elvia.io/"
 
 export PATH=/opt/homebrew/bin:$PATH
+export PATH=$HOME/bin:$PATH
 
 # # .NET Core SDK settings
 export DOTNET_CLI_TELEMETRY_OPTOUT=true
@@ -125,6 +126,12 @@ ZSH_THEME="avit"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git
+  npm
+  fzf
+  ripgrep
+  tmuxinator
+  docker
+  rust
 )
 
 source $ZSH/oh-my-zsh.sh
