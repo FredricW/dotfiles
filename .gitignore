@@ -9,3 +9,4 @@ macos/.config/*
 
 macos/.config/bpytop
 macos/.config/bpytop/error.log
+macos/.config/lvim/plugin
