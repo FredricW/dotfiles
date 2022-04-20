@@ -2,4 +2,10 @@
 # Vim files
 undo_files/
 swap_files/
-.vim/plugged/
+**/*/.vim/plugged/
+macos/.config/*
+!macos/.config/lvim
+
+
+macos/.config/bpytop
+macos/.config/bpytop/error.log
