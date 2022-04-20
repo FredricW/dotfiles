@@ -7,6 +7,8 @@ export VAULT_ADDR="https://vault.test-elvia.io/"
 
 export PATH=/opt/homebrew/bin:$PATH
 export PATH=$HOME/bin:$PATH
+export PATH=/Users/fredricwaadeland/.local/bin/lvim:$PATH
+alias lvim="/Users/fredricwaadeland/.local/bin/lvim"
 
 # # .NET Core SDK settings
 export DOTNET_CLI_TELEMETRY_OPTOUT=true
