@@ -10,3 +10,5 @@ macos/.config/*
 macos/.config/bpytop
 macos/.config/bpytop/error.log
 macos/.config/lvim/plugin
+macos/.config/lvim/lsp-settings/yamlls.json
+macos/.config/lvim/config.lua

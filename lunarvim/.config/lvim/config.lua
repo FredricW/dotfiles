@@ -24,6 +24,8 @@ lvim.keys.normal_mode["<C-s>"] = ":w<cr>"
 local set = vim.opt -- set options
 set.fillchars = set.fillchars + "diff:╱"
 -- vim.opt.laststatus = 3
+-- vim.api.nvim_set_hl("tokyonight", "DiffDelete", "guifg=#4D384D guibg=#312A3C")
+vim.cmd("highlight DiffDelete guifg=#4D384D guibg=#312A3C")
 
 -- Change Telescope navigation to use j and k for navigation and n and p for history in both input and normal mode.
 -- we use protected-mode (pcall) just in case the plugin wasn't loaded yet.
@@ -69,6 +71,10 @@ lvim.builtin.which_key.mappings["gd"] = {
 lvim.builtin.which_key.mappings["gD"] = {
 	"<cmd>DiffviewClose<cr>",
 	"Diffview Close",
+}
+lvim.builtin.which_key.mappings["gg"] = {
+	"<cmd>LazyGit<cr>",
+	"LazyGit",
 }
 
 -- TODO: User Config for predefined plugins
@@ -234,13 +240,29 @@ lvim.plugins = {
 					},
 				}
 			end
-			lspconfig.emmet_ls.setup({ capabilities = capabilities })
+			lspconfig.emmet_ls.setup({
+				capabilities = capabilities,
+				filetypes = {
+					"html",
+					"css",
+					"javascript",
+					"typescript",
+					"eruby",
+					"typescriptreact",
+					"javascriptreact",
+					"svelte",
+					"vue",
+				},
+			})
 		end,
 	},
+	{ "kdheepak/lazygit.nvim" },
+	{ "ggandor/lightspeed.nvim" },
 }
 
+-- autocmd BufNewFile,BufRead *.mdx set filetype=markdown.mdx
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
--- lvim.autocommands.custom_groups = {
---   { "BufWinEnter", "*.lua", "setlocal ts=8 sw=8" },
--- }
--- }
+lvim.autocommands.custom_groups = {
+	-- { "BufWinEnter", "*.lua", "setlocal ts=8 sw=8" },
+	{ "BufNewFile,BufRead", "*.mdx", "set filetype=markdown.mdx" },
+}

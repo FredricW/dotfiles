@@ -1,14 +1,14 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
-export VISUAL="nvim"
-export EDITOR="nvim"
+export VISUAL="lvim"
+export EDITOR="lvim"
 # source ~/.dotfile/tmuxinator.zsh
 export VAULT_ADDR="https://vault.test-elvia.io/"
 
-export PATH=/opt/homebrew/bin:$PATH
-export PATH=$HOME/bin:$PATH
-export PATH=/Users/fredricwaadeland/.local/bin/lvim:$PATH
-alias lvim="/Users/fredricwaadeland/.local/bin/lvim"
+export PATH=/opt/homebrew/bin:~/.local/bin:$HOME/bin:$PATH
+# export PATH=$HOME/bin:$PATH
+# export PATH=/Users/fredricwaadeland/.local/bin/lvim:$PATH
+#alias lvim="/Users/fredricwaadeland/.local/bin/lvim"
 
 # # .NET Core SDK settings
 export DOTNET_CLI_TELEMETRY_OPTOUT=true
@@ -218,3 +218,23 @@ export RIPGREP_CONFIG_PATH=/Users/hansfredricwaadeland/.ripgreprc
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+#compdef bit
+###-begin-bit-completions-###
+#
+# yargs command completion script
+#
+# Installation: /Users/fredricwaadeland/bin/bit completion >> ~/.zshrc
+#    or /Users/fredricwaadeland/bin/bit completion >> ~/.zsh_profile on OSX.
+#
+_bit_yargs_completions()
+{
+  local reply
+  local si=$IFS
+  IFS=$'
+' reply=($(COMP_CWORD="$((CURRENT-1))" COMP_LINE="$BUFFER" COMP_POINT="$CURSOR" /Users/fredricwaadeland/bin/bit --get-yargs-completions "${words[@]}"))
+  IFS=$si
+  _describe 'values' reply
+}
+compdef _bit_yargs_completions bit
+###-end-bit-completions-###
+
