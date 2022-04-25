@@ -17,22 +17,22 @@ export DOTNET_ENVIRONMENT='Development'
 
 alias ls="ls -1a"
 
-alias vi="nvim"
+# alias vi="nvim"
 
 bindkey "^[[1;3C" forward-word
 bindkey "^[[1;3D" backward-word
 
 alias doom="~/.emacs.d/bin/doom"
 
-alias note="cd ~/Documents/Notes && vim ."
+alias note="cd ~/Documents/Notes && $EDITOR"
 alias mux="tmuxinator"
 alias commit="git-cz"
 alias reload="source ~/.zshrc"
-alias vrc="nvim ~/dotfiles/macos/.vimrc"
-alias brc="nvim ~/dotfiles/macos/.bashrc"
-alias zrc="nvim ~/dotfiles/macos/.zshrc"
-alias bashprofile="vim ~/.bash_profile"
-alias dotfiles='cd ~/dotfiles' 
+alias vrc="$EDITOR ~/.vimrc"
+alias brc="$EDITOR ~/.bashrc"
+alias zrc="$EDITOR ~/.zshrc"
+alias bashprofile="$EDITOR ~/.bash_profile"
+alias dotfiles='cd ~/dotfiles && $EDITOR' 
 alias discard="hub checkout -- ."
 alias clean="hub clean -df"
 alias diff="hub diff --name-only develop..."
