@@ -1,14 +1,7 @@
+# MacOs
+.DS_Store
 
 # Vim files
 undo_files/
 swap_files/
-**/*/.vim/plugged/
-macos/.config/*
-!macos/.config/lvim
 
-
-macos/.config/bpytop
-macos/.config/bpytop/error.log
-macos/.config/lvim/plugin
-macos/.config/lvim/lsp-settings/yamlls.json
-macos/.config/lvim/config.lua
