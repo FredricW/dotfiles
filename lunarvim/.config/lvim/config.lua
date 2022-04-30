@@ -258,6 +258,8 @@ lvim.plugins = {
 	},
 	{ "kdheepak/lazygit.nvim" },
 	{ "ggandor/lightspeed.nvim" },
+	{ "knubie/vim-kitty-navigator" },
+	{ "mg979/vim-visual-multi" },
 }
 
 -- autocmd BufNewFile,BufRead *.mdx set filetype=markdown.mdx
