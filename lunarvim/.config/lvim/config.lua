@@ -27,6 +27,10 @@ set.fillchars = set.fillchars + "diff:╱"
 -- vim.api.nvim_set_hl("tokyonight", "DiffDelete", "guifg=#4D384D guibg=#312A3C")
 vim.cmd("highlight DiffDelete guifg=#4D384D guibg=#312A3C")
 
+vim.cmd('imap <silent><script><expr> <C-j> copilot#Accept("")')
+vim.cmd("let g:copilot_no_tab_map = v:true")
+vim.cmd("let g:copilot_assume_mapped = v:true")
+
 -- Change Telescope navigation to use j and k for navigation and n and p for history in both input and normal mode.
 -- we use protected-mode (pcall) just in case the plugin wasn't loaded yet.
 -- local _, actions = pcall(require, "telescope.actions")
@@ -85,6 +89,7 @@ lvim.builtin.notify.active = true
 lvim.builtin.terminal.active = true
 lvim.builtin.nvimtree.setup.view.side = "left"
 lvim.builtin.nvimtree.show_icons.git = 0
+lvim.builtin.nvimtree.setup.actions.open_file.quit_on_open = true
 
 -- if you don't want all the parsers change this to a table of the ones you want
 lvim.builtin.treesitter.ensure_installed = {
@@ -245,13 +250,6 @@ lvim.plugins = {
 				filetypes = {
 					"html",
 					"css",
-					"javascript",
-					"typescript",
-					"eruby",
-					"typescriptreact",
-					"javascriptreact",
-					"svelte",
-					"vue",
 				},
 			})
 		end,
@@ -260,6 +258,7 @@ lvim.plugins = {
 	{ "ggandor/lightspeed.nvim" },
 	{ "knubie/vim-kitty-navigator" },
 	{ "mg979/vim-visual-multi" },
+	{ "github/copilot.vim" },
 }
 
 -- autocmd BufNewFile,BufRead *.mdx set filetype=markdown.mdx
