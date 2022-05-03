@@ -238,3 +238,5 @@ _bit_yargs_completions()
 compdef _bit_yargs_completions bit
 ###-end-bit-completions-###
 
+eval "$(starship init zsh)"
+
