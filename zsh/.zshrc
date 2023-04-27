@@ -43,6 +43,13 @@ alias trunk="hub checkout trunk"
 alias pr="hub pr list"
 alias checkpr="hub pr checkout"
 
+alias t2="tree -L 2"
+alias t3="tree -L 3"
+alias t4="tree -L 4"
+alias t5="tree -L 5"
+
+alias wifi="networksetup -setnetworkserviceenabled Wi-Fi off && sleep 15 && networksetup -setnetworkserviceenabled Wi-Fi on"
+
 # fbr - checkout git branch (including remote branches)
 chk() {
  local branches branch
@@ -50,6 +57,25 @@ chk() {
   branch=$(echo "$branches" |
            fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
   git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+}
+
+rmadd(){
+  echo "deviceID (faux-device100):"
+  read DEVICE_ID
+  if [ -z "$DEVICE_ID" ]
+  then
+    DEVICE_ID="faux-device100"
+  fi
+  echo "code:"
+  read ONE_TIME_CODE
+  curl --location --request POST "https://webapp-dev.cloud.remarkable.engineering/token/json/3/device/new" \
+  --header "Content-Type: application/json" \
+  --data-raw "{
+	  \"code\": \"$ONE_TIME_CODE\",
+	  \"deviceID\": \"$DEVICE_ID\",
+	  \"deviceDesc\": \"remarkable\",
+	  \"secret\": \"banana\"
+  }"
 }
 
 alias dev="tmuxinator start -p ~/.config/tmuxinator/hafslund.yml"
@@ -125,6 +151,7 @@ ZSH_THEME="avit"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
+
 plugins=(
   git
   npm
@@ -133,7 +160,7 @@ plugins=(
   tmuxinator
   docker
   rust
-)
+  z)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -188,14 +215,14 @@ bindkey "^[[B" history-beginning-search-forward
 # bindkey "^[[A" history-beginning-search-backward-end
 # bindkey "^[[B" history-beginning-search-forward-end
 
-function zle-line-init zle-keymap-select {
-    VIM_PROMPT="%{$fg_bold[yellow]%} [% NORMAL]%  %{$reset_color%}"
-    RPS1="${${KEYMAP/vicmd/$VIM_PROMPT}/(main|viins)/}$(git_custom_status) $EPS1"
-    zle reset-prompt
-}
+# function zle-line-init zle-keymap-select {
+#     VIM_PROMPT="%{$fg_bold[yellow]%} [% NORMAL]%  %{$reset_color%}"
+#     RPS1="${${KEYMAP/vicmd/$VIM_PROMPT}/(main|viins)/}$(git_custom_status) $EPS1"
+#     zle reset-prompt
+# }
 
-zle -N zle-line-init
-zle -N zle-keymap-select
+# zle -N zle-line-init
+# zle -N zle-keymap-select
 export KEYTIMEOUT=1
 
 export BAT_THEME="Dracula"
@@ -238,5 +265,39 @@ _bit_yargs_completions()
 compdef _bit_yargs_completions bit
 ###-end-bit-completions-###
 
-eval "$(starship init zsh)"
 
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/fredricwaadeland/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/fredricwaadeland/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/fredricwaadeland/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/fredricwaadeland/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+#compdef bit
+###-begin-bit-completions-###
+#
+# yargs command completion script
+#
+# Installation: /Users/fredricwaadeland/bin/bit completion >> ~/.zshrc
+#    or /Users/fredricwaadeland/bin/bit completion >> ~/.zsh_profile on OSX.
+#
+_bit_yargs_completions()
+{
+  local reply
+  local si=$IFS
+  IFS=$'
+' reply=($(COMP_CWORD="$((CURRENT-1))" COMP_LINE="$BUFFER" COMP_POINT="$CURSOR" /Users/fredricwaadeland/bin/bit --get-yargs-completions "${words[@]}"))
+  IFS=$si
+  _describe 'values' reply
+}
+compdef _bit_yargs_completions bit
+###-end-bit-completions-###
+
+
+# bun completions
+[ -s "/Users/fredricwaadeland/.bun/_bun" ] && source "/Users/fredricwaadeland/.bun/_bun"
+
+# Bun
+export BUN_INSTALL="/Users/fredricwaadeland/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+eval "$(starship init zsh)"

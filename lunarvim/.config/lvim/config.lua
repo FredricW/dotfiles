@@ -142,7 +142,7 @@ local formatters = require("lvim.lsp.null-ls.formatters")
 formatters.setup({
 	--   { command = "black", filetypes = { "python" } },
 	--   { command = "isort", filetypes = { "python" } },
-	{ command = "stylua", filetypes = { "lua" } },
+	-- { command = "stylua", filetypes = { "lua" } },
 	{
 		-- each formatter accepts a list of options identical to https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md#Configuration
 		command = "prettier",
@@ -207,63 +207,63 @@ lvim.plugins = {
 			require("nvim-ts-autotag").setup()
 		end,
 	},
-	{
-		"aca/emmet-ls",
-		config = function()
-			local lspconfig = require("lspconfig")
-			local configs = require("lspconfig/configs")
+	-- {
+	-- 	"aca/emmet-ls",
+	-- 	config = function()
+	-- 		local lspconfig = require("lspconfig")
+	-- 		local configs = require("lspconfig/configs")
 
-			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			capabilities.textDocument.completion.completionItem.snippetSupport = true
-			capabilities.textDocument.completion.completionItem.resolveSupport = {
-				properties = {
-					"documentation",
-					"detail",
-					"additionalTextEdits",
-				},
-			}
+	-- 		local capabilities = vim.lsp.protocol.make_client_capabilities()
+	-- 		capabilities.textDocument.completion.completionItem.snippetSupport = true
+	-- 		capabilities.textDocument.completion.completionItem.resolveSupport = {
+	-- 			properties = {
+	-- 				"documentation",
+	-- 				"detail",
+	-- 				"additionalTextEdits",
+	-- 			},
+	-- 		}
 
-			if not lspconfig.emmet_ls then
-				configs.emmet_ls = {
-					default_config = {
-						cmd = { "emmet-ls", "--stdio" },
-						filetypes = {
-							"html",
-							"css",
-							"javascript",
-							"typescript",
-							"eruby",
-							"typescriptreact",
-							"javascriptreact",
-							"svelte",
-							"vue",
-						},
-						root_dir = function(fname)
-							return vim.loop.cwd()
-						end,
-						settings = {},
-					},
-				}
-			end
-			lspconfig.emmet_ls.setup({
-				capabilities = capabilities,
-				filetypes = {
-					"html",
-					"css",
-				},
-			})
-		end,
-	},
+	-- 		if not lspconfig.emmet_ls then
+	-- 			configs.emmet_ls = {
+	-- 				default_config = {
+	-- 					cmd = { "emmet-ls", "--stdio" },
+	-- 					filetypes = {
+	-- 						"html",
+	-- 						"css",
+	-- 						"javascript",
+	-- 						"typescript",
+	-- 						"eruby",
+	-- 						"typescriptreact",
+	-- 						"javascriptreact",
+	-- 						"svelte",
+	-- 						"vue",
+	-- 					},
+	-- 					root_dir = function(fname)
+	-- 						return vim.loop.cwd()
+	-- 					end,
+	-- 					settings = {},
+	-- 				},
+	-- 			}
+	-- 		end
+	-- 		lspconfig.emmet_ls.setup({
+	-- 			capabilities = capabilities,
+	-- 			filetypes = {
+	-- 				"html",
+	-- 				"css",
+	-- 			},
+	-- 		})
+	-- 	end,
+	-- },
 	{ "kdheepak/lazygit.nvim" },
 	{ "ggandor/lightspeed.nvim" },
 	{ "knubie/vim-kitty-navigator" },
 	{ "mg979/vim-visual-multi" },
-	{ "github/copilot.vim" },
+	-- { "github/copilot.vim" },
 }
 
 -- autocmd BufNewFile,BufRead *.mdx set filetype=markdown.mdx
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
-lvim.autocommands.custom_groups = {
-	-- { "BufWinEnter", "*.lua", "setlocal ts=8 sw=8" },
-	{ "BufNewFile,BufRead", "*.mdx", "set filetype=markdown.mdx" },
-}
+-- lvim.autocommands.custom_groups = {
+--   -- { "BufWinEnter", "*.lua", "setlocal ts=8 sw=8" },
+--   { "BufNewFile,BufRead", "*.mdx", "set filetype=markdown.mdx" },
+-- }
