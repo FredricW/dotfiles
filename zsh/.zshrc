@@ -5,7 +5,10 @@ export EDITOR="lvim"
 # source ~/.dotfile/tmuxinator.zsh
 export VAULT_ADDR="https://vault.test-elvia.io/"
 
-export PATH=/opt/homebrew/bin:~/.local/bin:$HOME/bin:$PATH
+export PATH=/usr/local/go:/opt/homebrew/bin:~/.local/bin:$HOME/bin:$PATH
+export JAVA_HOME="/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home"
+export PATH=$JAVA_HOME/bin:$PATH
+
 # export PATH=$HOME/bin:$PATH
 # export PATH=/Users/fredricwaadeland/.local/bin/lvim:$PATH
 #alias lvim="/Users/fredricwaadeland/.local/bin/lvim"
@@ -301,3 +304,5 @@ export BUN_INSTALL="/Users/fredricwaadeland/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
 eval "$(starship init zsh)"
+eval "$(github-copilot-cli alias -- "$0")"
+
