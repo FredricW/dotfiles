@@ -39,6 +39,21 @@ checked — tick one to install it, untick one to remove it.
 | `--status` | print what's installed and exit |
 | `--dry-run` | show what would happen, change nothing |
 
+### Tests
+
+```sh
+python3 .tests/test_install.py
+```
+
+Stdlib only, no test runner to install. The suite builds a throwaway repo and
+`$HOME` in a temp directory and runs against those, so it never touches your real
+dotfiles. The end-to-end tests drive the actual script inside a pty with a stub
+`stow` on `PATH`, which covers the checklist and the prompts.
+
+> The tests live in `.tests/` rather than `tests/` on purpose — every *non-hidden*
+> top level folder in this repo is a config, so a `tests/` folder would show up in
+> the installer's own checklist.
+
 ### Doing it by hand
 
 The installer is just a wrapper around stow, so this still works:
