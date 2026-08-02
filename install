@@ -1,0 +1,554 @@
+#!/usr/bin/env python3
+"""Interactive installer for this dotfiles repo.
+
+Wraps GNU stow. Each top-level directory in the repo is a "package" whose
+contents mirror their location under $HOME. Selecting a package symlinks its
+files into place; deselecting one removes those symlinks again.
+
+No third-party dependencies -- runs on the python3 that ships with macOS.
+"""
+
+import argparse
+import os
+import shutil
+import subprocess
+import sys
+import termios
+import time
+import tty
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent
+HOME = Path.home()
+BACKUP_ROOT = HOME / ".dotfiles-backups"
+IGNORED_NAMES = {".DS_Store"}
+
+# Package states
+LINKED = "linked"       # symlink already points into this repo
+MISSING = "missing"     # nothing at the target path
+CONFLICT = "conflict"   # something else is in the way
+
+
+# --------------------------------------------------------------------------
+# terminal helpers
+# --------------------------------------------------------------------------
+
+def supports_color():
+    return sys.stdout.isatty() and os.environ.get("NO_COLOR") is None
+
+
+class C:
+    """ANSI codes, blanked out when the terminal can't handle them."""
+    enabled = supports_color()
+
+    def __getattr__(self, name):
+        codes = {
+            "reset": "\033[0m", "bold": "\033[1m", "dim": "\033[2m",
+            "red": "\033[31m", "green": "\033[32m", "yellow": "\033[33m",
+            "blue": "\033[34m", "magenta": "\033[35m", "cyan": "\033[36m",
+            "gray": "\033[90m",
+        }
+        return codes.get(name, "") if C.enabled else ""
+
+
+c = C()
+
+
+def hide_cursor():
+    if sys.stdout.isatty():
+        sys.stdout.write("\033[?25l")
+        sys.stdout.flush()
+
+
+def show_cursor():
+    if sys.stdout.isatty():
+        sys.stdout.write("\033[?25h")
+        sys.stdout.flush()
+
+
+def read_key(fd):
+    """Read a single keypress, decoding the arrow-key escape sequences."""
+    ch = os.read(fd, 1).decode("utf-8", "ignore")
+    if ch != "\x1b":
+        return ch
+    # Could be a bare ESC or the start of a CSI sequence. Peek without blocking.
+    old = termios.tcgetattr(fd)
+    new = termios.tcgetattr(fd)
+    new[6][termios.VMIN] = 0
+    new[6][termios.VTIME] = 1  # 100ms
+    termios.tcsetattr(fd, termios.TCSANOW, new)
+    try:
+        rest = os.read(fd, 2).decode("utf-8", "ignore")
+    finally:
+        termios.tcsetattr(fd, termios.TCSANOW, old)
+    return {"[A": "up", "[B": "down", "[C": "right", "[D": "left"}.get(rest, "esc")
+
+
+def ask(question, choices, default=None):
+    """Prompt for one of `choices` (list of (key, label)). Returns the key."""
+    keys = [k for k, _ in choices]
+    rendered = "/".join(k.upper() if k == default else k for k in keys)
+    legend = "  ".join(f"{c.bold}{k}{c.reset} {label}" for k, label in choices)
+    print(f"    {legend}")
+    while True:
+        try:
+            answer = input(f"    {question} [{rendered}] ").strip().lower()
+        except EOFError:
+            print()
+            return default or keys[-1]
+        if not answer and default:
+            return default
+        if answer in keys:
+            return answer
+        # Accept a unique prefix, e.g. "back" for "b".
+        matches = [k for k in keys if k.startswith(answer)] if answer else []
+        if len(matches) == 1:
+            return matches[0]
+        print(f"    {c.red}Please answer with one of: {', '.join(keys)}{c.reset}")
+
+
+def confirm(question, default=True):
+    suffix = "Y/n" if default else "y/N"
+    while True:
+        try:
+            answer = input(f"  {question} [{suffix}] ").strip().lower()
+        except EOFError:
+            print()
+            return default
+        if not answer:
+            return default
+        if answer in ("y", "yes"):
+            return True
+        if answer in ("n", "no"):
+            return False
+
+
+# --------------------------------------------------------------------------
+# package model
+# --------------------------------------------------------------------------
+
+class Package:
+    def __init__(self, name):
+        self.name = name
+        self.path = REPO / name
+        self.entries = self._scan()
+
+    def _scan(self):
+        """Relative paths of every file this package would link into $HOME."""
+        found = []
+        for root, dirs, files in os.walk(self.path):
+            dirs[:] = [d for d in dirs if d not in IGNORED_NAMES]
+            for f in files:
+                if f in IGNORED_NAMES:
+                    continue
+                found.append(Path(root, f).relative_to(self.path))
+        return sorted(found)
+
+    def target(self, rel):
+        return HOME / rel
+
+    def state_of(self, rel):
+        target = self.target(rel)
+        if target.is_symlink():
+            try:
+                resolved = target.resolve()
+            except OSError:
+                return CONFLICT
+            return LINKED if resolved == (self.path / rel).resolve() else CONFLICT
+        return CONFLICT if target.exists() else MISSING
+
+    @property
+    def states(self):
+        return {rel: self.state_of(rel) for rel in self.entries}
+
+    @property
+    def linked_count(self):
+        return sum(1 for s in self.states.values() if s == LINKED)
+
+    @property
+    def installed(self):
+        """True when every file in the package is symlinked into place."""
+        return bool(self.entries) and self.linked_count == len(self.entries)
+
+    @property
+    def partial(self):
+        return 0 < self.linked_count < len(self.entries)
+
+    def conflicts(self):
+        return [rel for rel, s in self.states.items() if s == CONFLICT]
+
+    def status_label(self):
+        if self.installed:
+            return f"{c.green}installed{c.reset}"
+        if self.partial:
+            return f"{c.yellow}partial ({self.linked_count}/{len(self.entries)} linked){c.reset}"
+        return f"{c.gray}not installed{c.reset}"
+
+    def backups(self):
+        """Backup snapshot directories for this package, newest first."""
+        root = BACKUP_ROOT / self.name
+        if not root.is_dir():
+            return []
+        return sorted((d for d in root.iterdir() if d.is_dir()), reverse=True)
+
+
+def discover_packages():
+    names = sorted(
+        d.name for d in REPO.iterdir()
+        if d.is_dir() and not d.name.startswith(".")
+    )
+    return [p for p in (Package(n) for n in names) if p.entries]
+
+
+# --------------------------------------------------------------------------
+# dependency check
+# --------------------------------------------------------------------------
+
+def ensure_dependencies():
+    if shutil.which("stow"):
+        return True
+
+    print(f"  {c.red}✗{c.reset} {c.bold}stow{c.reset} is not installed "
+          f"{c.gray}(required to manage the symlinks){c.reset}\n")
+
+    brew = shutil.which("brew")
+    if brew:
+        if confirm("Install it now with `brew install stow`?"):
+            print()
+            result = subprocess.run([brew, "install", "stow"])
+            print()
+            if result.returncode == 0 and shutil.which("stow"):
+                print(f"  {c.green}✓{c.reset} stow installed\n")
+                return True
+            print(f"  {c.red}Installation failed.{c.reset} "
+                  f"Install stow manually, then re-run this script.\n")
+            return False
+        print(f"\n  Install it with:\n\n      brew install stow\n")
+        return False
+
+    print("  Homebrew was not found either. Install it first:\n")
+    print("      ./.install/install_homebrew.sh\n")
+    print("  or install stow through your platform's package manager")
+    print(f"  {c.gray}(apt install stow / dnf install stow / pacman -S stow){c.reset}\n")
+    return False
+
+
+# --------------------------------------------------------------------------
+# checklist UI
+# --------------------------------------------------------------------------
+
+def checklist(packages):
+    """Arrow-key checklist. Returns the set of package names left checked,
+    or None if the user aborted."""
+    selected = {p.name for p in packages if p.installed or p.partial}
+    initial = {p.name for p in packages if p.installed}
+    cursor = 0
+    width = max(len(p.name) for p in packages) + 2
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    lines_drawn = 0
+
+    def render(first):
+        nonlocal lines_drawn
+        out = []
+        for i, p in enumerate(packages):
+            checked = p.name in selected
+            pointer = f"{c.cyan}❯{c.reset}" if i == cursor else " "
+            if checked:
+                box = f"{c.green}[✓]{c.reset}"
+            elif p.partial:
+                box = f"{c.yellow}[~]{c.reset}"
+            else:
+                box = f"{c.gray}[ ]{c.reset}"
+            name = f"{c.bold}{p.name}{c.reset}" if i == cursor else p.name
+            pad = " " * (width - len(p.name))
+            out.append(f"\033[2K  {pointer} {box} {name}{pad}{p.status_label()}")
+
+        adds = sorted(selected - initial)
+        removes = sorted(initial - selected)
+        out.append("\033[2K")
+        if adds or removes:
+            parts = []
+            if adds:
+                parts.append(f"{c.green}+{len(adds)} install{c.reset}")
+            if removes:
+                parts.append(f"{c.red}-{len(removes)} remove{c.reset}")
+            out.append(f"\033[2K  {'   '.join(parts)}")
+        else:
+            out.append(f"\033[2K  {c.gray}no changes{c.reset}")
+        out.append("\033[2K")
+        out.append(f"\033[2K  {c.gray}↑↓ move   space toggle   a all   "
+                   f"n none   ⏎ apply   q quit{c.reset}")
+        # Redraw in place: jump back over the block we printed last time.
+        # Raw mode turns off newline translation, so emit CR explicitly.
+        prefix = "" if first else f"\r\033[{lines_drawn}A"
+        lines_drawn = len(out)
+        sys.stdout.write(prefix + "\r\n".join(out) + "\r\n")
+        sys.stdout.flush()
+
+    hide_cursor()
+    render(first=True)
+    try:
+        tty.setraw(fd)
+        while True:
+            key = read_key(fd)
+            if key in ("up", "k"):
+                cursor = (cursor - 1) % len(packages)
+            elif key in ("down", "j"):
+                cursor = (cursor + 1) % len(packages)
+            elif key == " ":
+                name = packages[cursor].name
+                selected.symmetric_difference_update({name})
+            elif key == "a":
+                selected = {p.name for p in packages}
+            elif key == "n":
+                selected = set()
+            elif key in ("\r", "\n"):
+                return selected
+            elif key in ("q", "esc", "\x03", "\x04"):
+                return None
+            else:
+                continue
+            render(first=False)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        show_cursor()
+
+
+# --------------------------------------------------------------------------
+# stow operations
+# --------------------------------------------------------------------------
+
+def run_stow(args, dry_run=False):
+    cmd = ["stow", "--no-folding", "-d", str(REPO), "-t", str(HOME)] + args
+    if dry_run:
+        print(f"    {c.gray}would run: {' '.join(cmd)}{c.reset}")
+        return True
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        message = (result.stderr or result.stdout).strip()
+        for line in message.splitlines():
+            print(f"    {c.red}{line}{c.reset}")
+        return False
+    return True
+
+
+def backup_paths(pkg, rels, stamp, dry_run=False):
+    """Move conflicting files into a timestamped backup snapshot."""
+    snapshot = BACKUP_ROOT / pkg.name / stamp
+    for rel in rels:
+        target = pkg.target(rel)
+        destination = snapshot / rel
+        if dry_run:
+            print(f"    {c.gray}would back up {tilde(target)} "
+                  f"→ {tilde(destination)}{c.reset}")
+            continue
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(target), str(destination))
+    return snapshot
+
+
+def remove_paths(pkg, rels, dry_run=False):
+    for rel in rels:
+        target = pkg.target(rel)
+        if dry_run:
+            print(f"    {c.gray}would delete {tilde(target)}{c.reset}")
+            continue
+        if target.is_dir() and not target.is_symlink():
+            shutil.rmtree(target)
+        else:
+            target.unlink()
+
+
+def tilde(path):
+    path = str(path)
+    home = str(HOME)
+    return "~" + path[len(home):] if path.startswith(home) else path
+
+
+def install_package(pkg, dry_run=False):
+    """Returns True on success, False on failure, None if the user aborted."""
+    print(f"  {c.bold}{pkg.name}{c.reset}")
+    conflicts = pkg.conflicts()
+
+    if conflicts:
+        print(f"    {c.yellow}{len(conflicts)} existing file"
+              f"{'s' if len(conflicts) > 1 else ''} in the way:{c.reset}")
+        for rel in conflicts[:10]:
+            print(f"      {tilde(pkg.target(rel))}")
+        if len(conflicts) > 10:
+            print(f"      {c.gray}… and {len(conflicts) - 10} more{c.reset}")
+
+        choice = ask(
+            "What should happen?",
+            [("b", "back up"), ("o", "overwrite"), ("s", "skip"), ("a", "abort")],
+            default="b",
+        )
+        if choice == "a":
+            return None
+        if choice == "s":
+            print(f"    {c.gray}skipped{c.reset}\n")
+            return True
+        if choice == "b":
+            stamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+            snapshot = backup_paths(pkg, conflicts, stamp, dry_run)
+            print(f"    {c.gray}backed up to {tilde(snapshot)}{c.reset}")
+        else:
+            remove_paths(pkg, conflicts, dry_run)
+            print(f"    {c.gray}removed {len(conflicts)} file(s){c.reset}")
+
+    ok = run_stow([pkg.name], dry_run)
+    if not ok:
+        print(f"    {c.red}✗ failed{c.reset}\n")
+        return False
+    print(f"    {c.green}✓ {'would install' if dry_run else 'installed'}"
+          f"{c.reset}\n")
+    return True
+
+
+def uninstall_package(pkg, dry_run=False):
+    print(f"  {c.bold}{pkg.name}{c.reset}")
+    ok = run_stow(["-D", pkg.name], dry_run)
+    if not ok:
+        print(f"    {c.red}✗ failed{c.reset}\n")
+        return False
+    print(f"    {c.green}✓ {'would remove' if dry_run else 'removed'}{c.reset}")
+
+    snapshots = pkg.backups()
+    if snapshots:
+        latest = snapshots[0]
+        print(f"    {c.gray}a backup from {latest.name.replace('_', ' ')} "
+              f"exists{c.reset}")
+        if confirm("  Restore it?", default=False):
+            restored, skipped = restore_backup(pkg, latest, dry_run)
+            verb = "would restore" if dry_run else "restored"
+            print(f"    {c.green}✓ {verb} {restored} file(s){c.reset}")
+            if skipped:
+                print(f"    {c.yellow}{skipped} skipped "
+                      f"(a file already exists at the target){c.reset}")
+    print()
+    return True
+
+
+def restore_backup(pkg, snapshot, dry_run=False):
+    restored = skipped = 0
+    for root, _, files in os.walk(snapshot):
+        for f in files:
+            source = Path(root, f)
+            target = HOME / source.relative_to(snapshot)
+            if target.exists() or target.is_symlink():
+                skipped += 1
+                continue
+            if dry_run:
+                print(f"    {c.gray}would restore {tilde(target)}{c.reset}")
+            else:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(source), str(target))
+            restored += 1
+    if not dry_run:
+        # Drop the snapshot once it has been emptied out.
+        if not any(p.is_file() for p in snapshot.rglob("*")):
+            shutil.rmtree(snapshot, ignore_errors=True)
+    return restored, skipped
+
+
+# --------------------------------------------------------------------------
+# entry point
+# --------------------------------------------------------------------------
+
+def print_status(packages):
+    width = max(len(p.name) for p in packages) + 2
+    for p in packages:
+        mark = (f"{c.green}✓{c.reset}" if p.installed
+                else f"{c.yellow}~{c.reset}" if p.partial
+                else f"{c.gray}·{c.reset}")
+        pad = " " * (width - len(p.name))
+        print(f"  {mark} {p.name}{pad}{p.status_label()}")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Install dotfile configurations from this repo via stow.")
+    parser.add_argument("-s", "--status", action="store_true",
+                        help="print what is installed and exit")
+    parser.add_argument("-n", "--dry-run", action="store_true",
+                        help="show what would happen without touching anything")
+    args = parser.parse_args()
+
+    print(f"\n  {c.bold}{c.magenta}dotfiles{c.reset} "
+          f"{c.gray}{tilde(REPO)}{c.reset}\n")
+
+    packages = discover_packages()
+    if not packages:
+        print(f"  {c.red}No packages found in {REPO}{c.reset}\n")
+        return 1
+
+    if args.status:
+        print_status(packages)
+        print()
+        return 0
+
+    if not ensure_dependencies():
+        return 1
+
+    if not (sys.stdin.isatty() and sys.stdout.isatty()):
+        print(f"  {c.yellow}Not running in a terminal — "
+              f"showing status only.{c.reset}\n")
+        print_status(packages)
+        print()
+        return 0
+
+    if args.dry_run:
+        print(f"  {c.yellow}dry run — nothing will be changed{c.reset}\n")
+
+    selected = checklist(packages)
+    if selected is None:
+        print(f"\n  {c.gray}Cancelled.{c.reset}\n")
+        return 130
+
+    to_install = [p for p in packages
+                  if p.name in selected and not p.installed]
+    to_remove = [p for p in packages
+                 if p.name not in selected and (p.installed or p.partial)]
+
+    if not to_install and not to_remove:
+        print(f"\n  {c.gray}Nothing to do.{c.reset}\n")
+        return 0
+
+    print()
+    if to_install:
+        print(f"  {c.green}install{c.reset}  "
+              f"{', '.join(p.name for p in to_install)}")
+    if to_remove:
+        print(f"  {c.red}remove {c.reset}  "
+              f"{', '.join(p.name for p in to_remove)}")
+    print()
+    if not confirm("Apply these changes?"):
+        print(f"\n  {c.gray}Cancelled.{c.reset}\n")
+        return 130
+    print()
+
+    failed = False
+    for pkg in to_remove:
+        if not uninstall_package(pkg, args.dry_run):
+            failed = True
+    for pkg in to_install:
+        result = install_package(pkg, args.dry_run)
+        if result is None:
+            print(f"  {c.gray}Aborted — earlier changes were kept.{c.reset}\n")
+            return 130
+        if not result:
+            failed = True
+
+    print(f"  {c.green}{c.bold}Done.{c.reset}\n" if not failed
+          else f"  {c.yellow}Finished with errors.{c.reset}\n")
+    return 1 if failed else 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        show_cursor()
+        print(f"\n\n  {c.gray}Cancelled.{c.reset}\n")
+        sys.exit(130)

@@ -17,7 +17,46 @@ Clone repo into user folder
 git clone git@github.com:FredricW/dotfiles.git ~/dotfiles
 ```
 
-"Install" the desired configs
+Then run the installer
+
+```sh
+cd ~/dotfiles/
+./install
+```
+
+It checks that `stow` is present (offering to `brew install` it if not), then shows a
+checklist of every config in the repo. Configs that are already installed start out
+checked — tick one to install it, untick one to remove it.
+
+- If a real file is already sitting where a config wants to go, you're asked whether to
+  back it up, overwrite it, skip that config, or abort.
+- Backups land in `~/.dotfiles-backups/<config>/<timestamp>/`, mirroring their original
+  paths.
+- When removing a config that has a backup, you're offered the chance to restore it.
+
+| flag | |
+|---|---|
+| `--status` | print what's installed and exit |
+| `--dry-run` | show what would happen, change nothing |
+
+### Tests
+
+```sh
+python3 .tests/test_install.py
+```
+
+Stdlib only, no test runner to install. The suite builds a throwaway repo and
+`$HOME` in a temp directory and runs against those, so it never touches your real
+dotfiles. The end-to-end tests drive the actual script inside a pty with a stub
+`stow` on `PATH`, which covers the checklist and the prompts.
+
+> The tests live in `.tests/` rather than `tests/` on purpose — every *non-hidden*
+> top level folder in this repo is a config, so a `tests/` folder would show up in
+> the installer's own checklist.
+
+### Doing it by hand
+
+The installer is just a wrapper around stow, so this still works:
 
 ```sh
 cd ~/dotfiles/
